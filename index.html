@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI4 Production Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .counter-container {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column; /* Display counters vertically */
+            align-items: center;
+        }
+        .counter {
+            margin: 1px;
+            display: flex;
+            align-items: center;
+			font-size: 18px;
+        }
+        .counter p {
+            font-size: 18px;
+            margin-right: 10px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+        }
+        .arrow-button, #reset-all {
+            padding: 2px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+			font-size: 20px;
+			border-radius: 5px;
+        }
+        /* Adjust the width of the resources input field */
+        #resources, #production {
+            width: 40px; /* Adjust the width as needed */
+			margin: 5px;
+            align-items: center;
+			font-size: 18px;
+        }
+        #reset-all {
+            background-color: #FF4500;
+        }
+        #total {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        #warning, #warning-production {
+            color: red;
+            font-weight: bold;
+        }
+        .counter img {
+            max-width: 50px;
+            max-height: 40px;
+            margin-right: 10px;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            height: 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #007BFF;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        .progress-bar.exceeded {
+            background-color: #FF4500;
+        }
+    </style>
+</head>
+<body>
+    <label for="resources">Resources &#128176;:</label>
+    <!-- Input field for resources value -->
+    <input type="number" id="resources" value="5">
+    <p>
+	<label for="production">Production &#127981;:</label>
+	<input type="number" id="production" value="5">
+	</p>
+    <div class="counter-container">
+        <!-- Counter 1 with ID -->
+        <div class="counter" id="counter1">
+            <img src="fighter.png" alt="Counter 1">
+            <p>Fighters (2x)</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+		<!-- Counter 2 with ID -->
+        <div class="counter" id="counter2">
+            <img src="infantry.png" alt="Counter 2">
+            <p>Infantry (2x)</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+        <!-- Counter 3 with ID -->
+        <div class="counter" id="counter3">
+            <img src="cruiser.png" alt="Counter 3">
+            <p>Cruiser</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+        <!-- Counter 4 with ID -->
+        <div class="counter" id="counter4">
+            <img src="destroyer.png" alt="Counter 4">
+            <p>Destroyer</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+		<!-- Counter 5 with ID -->
+        <div class="counter" id="counter5">
+            <img src="carrier.png" alt="Counter 5">
+            <p>Carrier</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+		<!-- Counter 6 with ID -->
+        <div class="counter" id="counter6">
+            <img src="dreadnought.png" alt="Counter 6">
+            <p>Dreadnought</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+		<!-- Counter 7 with ID -->
+        <div class="counter" id="counter7">
+            <img src="flagship.png" alt="Counter 7">
+            <p>Flagship</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+		<!-- Counter 8 with ID -->
+        <div class="counter" id="counter8">
+            <img src="war_sun.png" alt="Counter 8">
+            <p>War Sun</p>
+            <button class="arrow-button decrement">-</button>
+            <span class="count">0</span>
+            <button class="arrow-button increment">+</button>
+        </div>
+    </div>
+    <button id="reset-all">Reset All</button>
+    <!-- Display the total count -->
+
+    <div id="total">Resources spent: <span id="total-count">0</span></div>
+    <!-- Display a warning message -->
+    <div id="warning"></div>
+    <!-- Progress bar container -->
+    <div class="progress-container">
+        <!-- Progress bar element -->
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div id="total">Production spent: <span id="total-production-count">0</span></div>
+    <!-- Display a warning message -->
+    <div id="warning-production"></div>
+    <!-- Progress bar container -->
+    <div class="progress-container">
+        <!-- Progress bar element -->
+        <div class="progress-bar" id="progress-bar-production"></div>
+	</div>
+
+    <script>
+        // Get reset button element
+        const resetButton = document.getElementById("reset-all");
+        // Get total count span element
+        const totalSpan = document.getElementById("total-count");
+        // Get total count span element
+        const totalSpanProduction = document.getElementById("total-production-count");
+        // Get warning message div element
+        const warningDiv = document.getElementById("warning");
+        // Get warning message div element
+        const warningProductionDiv = document.getElementById("warning-production");
+        // Get resources input element
+        const resourcesInput = document.getElementById("resources");
+        // Get production input element
+        const InputProduction = document.getElementById("production");
+        // Get progress bar element
+        const progressBar = document.getElementById("progress-bar");
+        // Get production progress bar element
+		const progressBarProduction = document.getElementById("progress-bar-production");
+
+        // Initialize resources value
+        let resourcesValue = parseInt(resourcesInput.value, 10);
+        // Initialize production value
+        let thresholdValueProduction = parseInt(InputProduction.value, 10);
+        // Initialize total count
+        let total = 0;
+		let production =0;
+
+        // Function to update total count
+        function updateTotal() {
+            total = parseInt(document.getElementById("counter1").querySelector(".count").textContent, 10) +
+                    parseInt(document.getElementById("counter2").querySelector(".count").textContent, 10) +
+                    parseInt(document.getElementById("counter3").querySelector(".count").textContent, 10) * 2 +
+					parseInt(document.getElementById("counter4").querySelector(".count").textContent, 10) * 1 +
+					parseInt(document.getElementById("counter5").querySelector(".count").textContent, 10) * 3 +
+					parseInt(document.getElementById("counter6").querySelector(".count").textContent, 10) * 4 +
+					parseInt(document.getElementById("counter7").querySelector(".count").textContent, 10) * 8 +
+					parseInt(document.getElementById("counter8").querySelector(".count").textContent, 10) * 12;
+
+            totalSpan.textContent = total;
+            updateProgressBar();
+            updateWarning();
+			updateTotalProduction();
+        }
+
+        function updateTotalProduction() {
+            fighter = parseInt(document.getElementById("counter1").querySelector(".count").textContent, 10);
+			infantry = parseInt(document.getElementById("counter2").querySelector(".count").textContent, 10);
+            cruiser = parseInt(document.getElementById("counter3").querySelector(".count").textContent, 10);
+            destroyer = parseInt(document.getElementById("counter4").querySelector(".count").textContent, 10);
+			carrier = parseInt(document.getElementById("counter5").querySelector(".count").textContent, 10);
+			dreadnought = parseInt(document.getElementById("counter6").querySelector(".count").textContent, 10);
+			flagship = parseInt(document.getElementById("counter7").querySelector(".count").textContent, 10);
+			warsun = parseInt(document.getElementById("counter8").querySelector(".count").textContent, 10);
+			
+
+			production = (fighter * 2) + (infantry * 2) + cruiser + destroyer + carrier + dreadnought + flagship + warsun;
+            totalSpanProduction.textContent = production;
+            updateProgressBar();
+            updateWarning();
+        }
+
+        // Loop through each counter
+        for (let i = 1; i <= 8; i++) {
+            const decrementButton = document.getElementById(`counter${i}`).querySelector(".decrement");
+            const incrementButton = document.getElementById(`counter${i}`).querySelector(".increment");
+            const countSpan = document.getElementById(`counter${i}`).querySelector(".count");
+
+            let count = 0;
+
+            // Decrement button click event
+            decrementButton.addEventListener("click", () => {
+                if (count > 0) {
+                    count--;
+                    countSpan.textContent = count;
+                    updateTotal();
+                    updateProgressBar();
+                }
+            });
+
+            // Increment button click event
+            incrementButton.addEventListener("click", () => {
+                count++;
+                countSpan.textContent = count;
+                updateTotal();
+                updateProgressBar();
+            });
+
+            // Count input change event
+            countSpan.addEventListener("input", () => {
+                count = parseInt(countSpan.textContent, 10);
+                updateTotal();
+                updateProgressBar();
+            });
+        }
+
+        // Reset button click event
+        resetButton.addEventListener("click", () => {
+            for (let i = 1; i <= 8; i++) {
+                const countSpan = document.getElementById(`counter${i}`).querySelector(".count");
+                countSpan.textContent = "0";
+            }
+            total = 0;
+			production =0;
+            totalSpan.textContent = total;
+			totalSpanProduction.textContent = production;
+            updateProgressBar();
+            updateWarning();
+        });
+
+        // Update progress bar width and color
+        function updateProgressBar() {
+            const percentage = (total / resourcesValue) * 100;
+            progressBar.style.width = percentage > 100 ? "100%" : `${percentage}%`;
+            if (total > resourcesValue) {
+                progressBar.classList.add("exceeded");
+            } else {
+                progressBar.classList.remove("exceeded");
+            }
+			updateProgressBarProduction();
+        }
+
+        function updateProgressBarProduction() {
+            const percentage = (production / thresholdValueProduction) * 100;
+            progressBarProduction.style.width = percentage > 100 ? "100%" : `${percentage}%`;
+            if (production > thresholdValueProduction) {
+                progressBarProduction.classList.add("exceeded");
+            } else {
+                progressBarProduction.classList.remove("exceeded");
+            }
+        }
+
+        // Update warning message
+        function updateWarning() {
+            if (total > resourcesValue) {
+                warningDiv.textContent = "Available resources exeeded!";
+            } else {
+                warningDiv.textContent = "";
+            }
+			
+			if (production > thresholdValueProduction) {
+                warningProductionDiv.textContent = "Available production exeeded!";
+            } else {
+                warningProductionDiv.textContent = "";
+            }
+        }
+
+        // Listen for resources value changes
+        resourcesInput.addEventListener("input", () => {
+            resourcesValue = parseInt(resourcesInput.value, 10);
+            updateProgressBar();
+            updateWarning();
+        });
+
+        // Listen for production value changes
+        InputProduction.addEventListener("input", () => {
+            thresholdValueProduction = parseInt(InputProduction.value, 10);
+            updateProgressBar();
+            updateWarning();
+        });
+
+        // Initial update of total, progress bar, and warning
+        updateTotal();
+        updateProgressBar();
+        updateWarning();
+    </script>
+</body>
+</html>
