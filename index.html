@@ -79,18 +79,18 @@
     </style>
 </head>
 <body>
-    <label for="resources">Resources &#128176;:</label>
+    <label for="resources" title="this is the yellow number on all your unexhausted planets combined">Resources &#128176;:</label>
     <!-- Input field for resources value -->
     <input type="number" id="resources" value="5">
     <p>
-	<label for="production">Production &#127981;:</label>
+	<label for="production" title="this is the production value on your space dock (the planet it is standing on matters!). this is the amount of plastic you can put down on the board in total">Production &#127981;:</label>
 	<input type="number" id="production" value="5">
 	</p>
     <div class="counter-container">
         <!-- Counter 1 with ID -->
         <div class="counter" id="counter1">
             <img src="fighter.png" alt="Counter 1">
-            <p>Fighters (2x)</p>
+            <p title="fighters ships don't count towards fleet size, but you must have CAPACITY from space docks or other ships">Fighters (2x)</p>
             <button class="arrow-button decrement">-</button>
             <span class="count">0</span>
             <button class="arrow-button increment">+</button>
@@ -98,7 +98,7 @@
 		<!-- Counter 2 with ID -->
         <div class="counter" id="counter2">
             <img src="infantry.png" alt="Counter 2">
-            <p>Infantry (2x)</p>
+            <p title="Infantry don't count towards fleet size, but you must have CAPACITY on ships to take them off planet.">Infantry (2x)</p>
             <button class="arrow-button decrement">-</button>
             <span class="count">0</span>
             <button class="arrow-button increment">+</button>
@@ -176,7 +176,7 @@
         // Get reset button element
         const resetButton = document.getElementById("reset-all");
         // Get total count span element
-        const totalSpan = document.getElementById("total-count");
+        const totalSpanResources = document.getElementById("total-count");
         // Get total count span element
         const totalSpanProduction = document.getElementById("total-production-count");
         // Get warning message div element
@@ -200,24 +200,8 @@
         let total = 0;
 		let production =0;
 
-        // Function to update total count
+        // Function to update the spent resource and total production count
         function updateTotal() {
-            total = parseInt(document.getElementById("counter1").querySelector(".count").textContent, 10) +
-                    parseInt(document.getElementById("counter2").querySelector(".count").textContent, 10) +
-                    parseInt(document.getElementById("counter3").querySelector(".count").textContent, 10) * 2 +
-					parseInt(document.getElementById("counter4").querySelector(".count").textContent, 10) * 1 +
-					parseInt(document.getElementById("counter5").querySelector(".count").textContent, 10) * 3 +
-					parseInt(document.getElementById("counter6").querySelector(".count").textContent, 10) * 4 +
-					parseInt(document.getElementById("counter7").querySelector(".count").textContent, 10) * 8 +
-					parseInt(document.getElementById("counter8").querySelector(".count").textContent, 10) * 12;
-
-            totalSpan.textContent = total;
-            updateProgressBar();
-            updateWarning();
-			updateTotalProduction();
-        }
-
-        function updateTotalProduction() {
             fighter = parseInt(document.getElementById("counter1").querySelector(".count").textContent, 10);
 			infantry = parseInt(document.getElementById("counter2").querySelector(".count").textContent, 10);
             cruiser = parseInt(document.getElementById("counter3").querySelector(".count").textContent, 10);
@@ -229,7 +213,10 @@
 			
 
 			production = (fighter * 2) + (infantry * 2) + cruiser + destroyer + carrier + dreadnought + flagship + warsun;
+			total = fighter + infantry + (cruiser * 2) + destroyer + (carrier * 3) + (dreadnought *4) + (flagship * 8) + (warsun * 12);
+			totalSpanResources.textContent = total;
             totalSpanProduction.textContent = production;
+	
             updateProgressBar();
             updateWarning();
         }
@@ -276,10 +263,11 @@
             }
             total = 0;
 			production =0;
-            totalSpan.textContent = total;
+            totalSpanResources.textContent = total;
 			totalSpanProduction.textContent = production;
             updateProgressBar();
             updateWarning();
+			console.log ("some text")
         });
 
         // Update progress bar width and color
