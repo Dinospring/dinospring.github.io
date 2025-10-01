@@ -190,10 +190,6 @@
     const sarweenCheckbox = document.getElementById("sarween-tools");
     // Discounted total span
     const discountedTotalSpan = document.getElementById("discounted-total-count");
-    // Sarween Tools checkbox
-    const sarweenCheckbox = document.getElementById("sarween-tools");
-    // Discounted total span
-    const discountedTotalSpan = document.getElementById("discounted-total-count");
         // Get reset button element
         const resetButton = document.getElementById("reset-all");
         // Get total count span element
@@ -234,36 +230,32 @@
 
         // Loop through each counter
     for (let i = 1; i <= 8; i++) {
-    for (let i = 1; i <= 8; i++) {
-            const decrementButton = document.getElementById(`counter${i}`).querySelector(".decrement");
-            const incrementButton = document.getElementById(`counter${i}`).querySelector(".increment");
-            const countSpan = document.getElementById(`counter${i}`).querySelector(".count");
+        const decrementButton = document.getElementById(`counter${i}`).querySelector(".decrement");
+        const incrementButton = document.getElementById(`counter${i}`).querySelector(".increment");
+        const countSpan = document.getElementById(`counter${i}`).querySelector(".count");
 
-            // Decrement button click event
-            decrementButton.addEventListener("click", () => {
-                if (counterValues[i-1] > 0) {
-                    counterValues[i-1]--;
-                    countSpan.textContent = counterValues[i-1];
-                    updateTotal();
-                    updateProgressBar();
-                }
-            });
-
-            // Increment button click event
-            incrementButton.addEventListener("click", () => {
-                counterValues[i-1]++;
+        // Decrement button click event
+        decrementButton.addEventListener("click", () => {
+            if (counterValues[i-1] > 0) {
+                counterValues[i-1]--;
                 countSpan.textContent = counterValues[i-1];
                 updateTotal();
-                updateProgressBar();
-            });
+            }
+        });
 
-            // Count input change event (if ever used)
-            countSpan.addEventListener("input", () => {
-                counterValues[i-1] = parseInt(countSpan.textContent, 10);
-                updateTotal();
-                updateProgressBar();
-            });
-        }
+        // Increment button click event
+        incrementButton.addEventListener("click", () => {
+            counterValues[i-1]++;
+            countSpan.textContent = counterValues[i-1];
+            updateTotal();
+        });
+
+        // Count input change event (if ever used)
+        countSpan.addEventListener("input", () => {
+            counterValues[i-1] = parseInt(countSpan.textContent, 10);
+            updateTotal();
+        });
+    }
 
         // Reset button click event
         resetButton.addEventListener("click", () => {
@@ -274,10 +266,7 @@
             }
             total = 0;
             production = 0;
-            totalSpanResources.textContent = total;
-            totalSpanProduction.textContent = production;
-            updateProgressBar();
-            updateWarning();
+            updateTotal();
         });
 
         // Listen for Sarween Tools checkbox changes
@@ -344,11 +333,6 @@
 
         // Initial update of total, progress bar, and warning
     updateTotal();
-    updateProgressBar();
-    updateWarning();
-    updateTotal();
-    updateProgressBar();
-    updateWarning();
     </script>
 </body>
 </html>
