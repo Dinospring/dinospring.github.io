@@ -90,6 +90,13 @@
         <input type="checkbox" id="sarween-tools">
         <label for="sarween-tools" title="If you have the Sarween Tools technology, your total resource cost is reduced by 1 (minimum 0)"><b>Advanced: Sarween Tools</b></label>
     </div>
+    <label for="production" title="this is the production value on your space dock (the planet it is standing on matters!). this is the amount of plastic you can put down on the board in total">Production &#127981;:</label>
+    <input type="number" id="production" value="5">
+    </p>
+    <div style="margin-bottom: 10px;">
+        <input type="checkbox" id="sarween-tools">
+        <label for="sarween-tools" title="If you have the Sarween Tools technology, your total resource cost is reduced by 1 (minimum 0)"><b>Advanced: Sarween Tools</b></label>
+    </div>
     <div class="counter-container">
         <!-- Counter 1 with ID -->
         <div class="counter" id="counter1">
@@ -161,6 +168,7 @@
 
     <div id="total">Resources spent: <span id="total-count">0</span></div>
     <div id="total">Resources spent (after Sarween Tools): <span id="discounted-total-count">0</span></div>
+    <div id="total">Resources spent (after Sarween Tools): <span id="discounted-total-count">0</span></div>
     <!-- Display a warning message -->
     <div id="warning"></div>
     <!-- Progress bar container -->
@@ -178,6 +186,10 @@
 	</div>
 
     <script>
+    // Sarween Tools checkbox
+    const sarweenCheckbox = document.getElementById("sarween-tools");
+    // Discounted total span
+    const discountedTotalSpan = document.getElementById("discounted-total-count");
     // Sarween Tools checkbox
     const sarweenCheckbox = document.getElementById("sarween-tools");
     // Discounted total span
@@ -207,19 +219,21 @@
             const [fighter, infantry, cruiser, destroyer, carrier, dreadnought, flagship, warsun] = counterValues;
             production = (fighter * 2) + (infantry * 2) + cruiser + destroyer + carrier + dreadnought + flagship + warsun;
             total = fighter + infantry + (cruiser * 2) + destroyer + (carrier * 3) + (dreadnought * 4) + (flagship * 8) + (warsun * 12);
-            totalSpanResources.textContent = total;
-            totalSpanProduction.textContent = production;
             // Apply Sarween Tools discount
             let discountedTotal = total;
             if (sarweenCheckbox.checked) {
                 discountedTotal = Math.max(0, total - 1);
             }
+            // Update both resource displays to show discounted value
+            totalSpanResources.textContent = discountedTotal;
             discountedTotalSpan.textContent = discountedTotal;
-            updateProgressBar();
-            updateWarning();
+            totalSpanProduction.textContent = production;
+            updateProgressBar(discountedTotal);
+            updateWarning(discountedTotal);
         }
 
         // Loop through each counter
+    for (let i = 1; i <= 8; i++) {
     for (let i = 1; i <= 8; i++) {
             const decrementButton = document.getElementById(`counter${i}`).querySelector(".decrement");
             const incrementButton = document.getElementById(`counter${i}`).querySelector(".increment");
@@ -271,16 +285,23 @@
             updateTotal();
         });
 
+        // Listen for Sarween Tools checkbox changes
+        sarweenCheckbox.addEventListener("change", () => {
+            updateTotal();
+        });
+
         // Update progress bar width and color
-        function updateProgressBar() {
-            const percentage = (total / resourcesValue) * 100;
+        function updateProgressBar(currentTotal) {
+            // Use discounted total for progress bar
+            const barTotal = typeof currentTotal === 'number' ? currentTotal : total;
+            const percentage = (barTotal / resourcesValue) * 100;
             progressBar.style.width = percentage > 100 ? "100%" : `${percentage}%`;
-            if (total > resourcesValue) {
+            if (barTotal > resourcesValue) {
                 progressBar.classList.add("exceeded");
             } else {
                 progressBar.classList.remove("exceeded");
             }
-			updateProgressBarProduction();
+            updateProgressBarProduction();
         }
 
         function updateProgressBarProduction() {
@@ -294,14 +315,15 @@
         }
 
         // Update warning message
-        function updateWarning() {
-            if (total > resourcesValue) {
+        function updateWarning(currentTotal) {
+            // Use discounted total for warning
+            const warnTotal = typeof currentTotal === 'number' ? currentTotal : total;
+            if (warnTotal > resourcesValue) {
                 warningDiv.textContent = "Available resources exeeded!";
             } else {
                 warningDiv.textContent = "";
             }
-			
-			if (production > thresholdValueProduction) {
+            if (production > thresholdValueProduction) {
                 warningProductionDiv.textContent = "Available production exeeded!";
             } else {
                 warningProductionDiv.textContent = "";
@@ -311,18 +333,19 @@
         // Listen for resources value changes
         resourcesInput.addEventListener("input", () => {
             resourcesValue = parseInt(resourcesInput.value, 10);
-            updateProgressBar();
-            updateWarning();
+            updateTotal();
         });
 
         // Listen for production value changes
         InputProduction.addEventListener("input", () => {
             thresholdValueProduction = parseInt(InputProduction.value, 10);
-            updateProgressBar();
-            updateWarning();
+            updateTotal();
         });
 
         // Initial update of total, progress bar, and warning
+    updateTotal();
+    updateProgressBar();
+    updateWarning();
     updateTotal();
     updateProgressBar();
     updateWarning();
