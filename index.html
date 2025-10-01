@@ -83,9 +83,13 @@
     <!-- Input field for resources value -->
     <input type="number" id="resources" value="5">
     <p>
-	<label for="production" title="this is the production value on your space dock (the planet it is standing on matters!). this is the amount of plastic you can put down on the board in total">Production &#127981;:</label>
-	<input type="number" id="production" value="5">
-	</p>
+    <label for="production" title="this is the production value on your space dock (the planet it is standing on matters!). this is the amount of plastic you can put down on the board in total">Production &#127981;:</label>
+    <input type="number" id="production" value="5">
+    </p>
+    <div style="margin-bottom: 10px;">
+        <input type="checkbox" id="sarween-tools">
+        <label for="sarween-tools" title="If you have the Sarween Tools technology, your total resource cost is reduced by 1 (minimum 0)"><b>Advanced: Sarween Tools</b></label>
+    </div>
     <div class="counter-container">
         <!-- Counter 1 with ID -->
         <div class="counter" id="counter1">
@@ -156,6 +160,7 @@
     <!-- Display the total count -->
 
     <div id="total">Resources spent: <span id="total-count">0</span></div>
+    <div id="total">Resources spent (after Sarween Tools): <span id="discounted-total-count">0</span></div>
     <!-- Display a warning message -->
     <div id="warning"></div>
     <!-- Progress bar container -->
@@ -173,6 +178,10 @@
 	</div>
 
     <script>
+    // Sarween Tools checkbox
+    const sarweenCheckbox = document.getElementById("sarween-tools");
+    // Discounted total span
+    const discountedTotalSpan = document.getElementById("discounted-total-count");
         // Get reset button element
         const resetButton = document.getElementById("reset-all");
         // Get total count span element
@@ -200,12 +209,18 @@
             total = fighter + infantry + (cruiser * 2) + destroyer + (carrier * 3) + (dreadnought * 4) + (flagship * 8) + (warsun * 12);
             totalSpanResources.textContent = total;
             totalSpanProduction.textContent = production;
+            // Apply Sarween Tools discount
+            let discountedTotal = total;
+            if (sarweenCheckbox.checked) {
+                discountedTotal = Math.max(0, total - 1);
+            }
+            discountedTotalSpan.textContent = discountedTotal;
             updateProgressBar();
             updateWarning();
         }
 
         // Loop through each counter
-        for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 8; i++) {
             const decrementButton = document.getElementById(`counter${i}`).querySelector(".decrement");
             const incrementButton = document.getElementById(`counter${i}`).querySelector(".increment");
             const countSpan = document.getElementById(`counter${i}`).querySelector(".count");
@@ -249,6 +264,11 @@
             totalSpanProduction.textContent = production;
             updateProgressBar();
             updateWarning();
+        });
+
+        // Listen for Sarween Tools checkbox changes
+        sarweenCheckbox.addEventListener("change", () => {
+            updateTotal();
         });
 
         // Update progress bar width and color
@@ -303,9 +323,9 @@
         });
 
         // Initial update of total, progress bar, and warning
-        updateTotal();
-        updateProgressBar();
-        updateWarning();
+    updateTotal();
+    updateProgressBar();
+    updateWarning();
     </script>
 </body>
 </html>
