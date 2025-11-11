@@ -80,14 +80,23 @@
         .tooltip {
             position: absolute;
             display: none;
+            align-items: center;
             background: rgba(0,0,0,0.85);
             color: #fff;
             padding: 8px 10px;
             border-radius: 6px;
             font-size: 14px;
-            max-width: 280px;
+            max-width: 640px;
+            /* allow tooltip to grow when showing a large icon */
             z-index: 9999;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .tooltip img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-right: 12px;
+            flex: 0 0 auto;
         }
         /* Utility class for screen-reader-only content (if needed) */
         .sr-only {
@@ -224,16 +233,48 @@
 
         function showTooltipFor(targetElement, text) {
             if (!targetElement || !text) return;
-            // Update visible tooltip and aria-live text
-            tooltip.textContent = text;
-            // Position tooltip below the target element if possible
+            // Clear previous contents
+            while (tooltip.firstChild) tooltip.removeChild(tooltip.firstChild);
+
+            // Optionally show the resource image next to the tooltip when the target is the resources input/label
+            const showResourceIcon = (targetElement === resourcesInput) || (targetElement.id === 'resources') || (targetElement.tagName === 'LABEL' && targetElement.getAttribute('for') === 'resources');
+            if (showResourceIcon) {
+                const img = document.createElement('img');
+                img.src = 'resource.png';
+                img.alt = 'Resources';
+                img.setAttribute('aria-hidden', 'true');
+                tooltip.appendChild(img);
+            }
+
+            // Optionally show the space dock image next to the tooltip when the target is the production input/label
+            const showProductionIcon = (targetElement === InputProduction) || (targetElement.id === 'production') || (targetElement.tagName === 'LABEL' && targetElement.getAttribute('for') === 'production');
+            if (showProductionIcon) {
+                const img = document.createElement('img');
+                img.src = 'space_dock_1.png';
+                img.alt = 'Space Dock';
+                img.setAttribute('aria-hidden', 'true');
+                tooltip.appendChild(img);
+            }
+
+            // Append a text node so aria-live announces changes
+            const textSpan = document.createElement('span');
+            textSpan.textContent = text;
+            tooltip.appendChild(textSpan);
+
+            // Show the tooltip as flex but keep it hidden while we measure its size
+            tooltip.style.display = 'flex';
+            tooltip.style.visibility = 'hidden';
+
+            // Position tooltip below the target element, centering using measured tooltip width
             const rect = targetElement.getBoundingClientRect();
-            // Basic positioning: center horizontally below the element
-            const left = Math.max(8, rect.left + window.scrollX + (rect.width / 2) - 140);
+            const tipRect = tooltip.getBoundingClientRect();
+            const left = Math.max(8, rect.left + window.scrollX + (rect.width / 2) - (tipRect.width / 2));
             const top = rect.bottom + window.scrollY + 8;
             tooltip.style.left = `${left}px`;
             tooltip.style.top = `${top}px`;
-            tooltip.style.display = 'block';
+            // Reveal it now that we've positioned it
+            tooltip.style.visibility = 'visible';
+
             // For touch interactions: auto-hide after 3.5s
             if (touchHideTimer) {
                 clearTimeout(touchHideTimer);
@@ -246,7 +287,8 @@
 
         function hideTooltip() {
             tooltip.style.display = 'none';
-            tooltip.textContent = '';
+            // Clear children so next show starts fresh
+            while (tooltip.firstChild) tooltip.removeChild(tooltip.firstChild);
             if (touchHideTimer) {
                 clearTimeout(touchHideTimer);
                 touchHideTimer = null;
