@@ -120,6 +120,10 @@
 	<label for="production" title="this is the production value on your space dock (the planet it is standing on matters!). this is the amount of plastic you can put down on the board in total">Production &#127981;:</label>
 	<input type="number" id="production" value="5">
 	</p>
+    <p>
+    <input type="checkbox" id="sarween">
+    <label for="sarween" title="When 1 or more of your units use Production, reduce the combined cost of the produced units by 1">Sarween Tools</label>
+    </p>
     <div class="counter-container">
         <!-- Counter 1 with ID -->
         <div class="counter" id="counter1">
@@ -216,6 +220,7 @@
         const warningProductionDiv = document.getElementById("warning-production");
         const resourcesInput = document.getElementById("resources");
         const InputProduction = document.getElementById("production");
+    const sarweenCheckbox = document.getElementById("sarween");
         const progressBar = document.getElementById("progress-bar");
         const progressBarProduction = document.getElementById("progress-bar-production");
         // Tooltip/ARIA live region for accessible explanations
@@ -323,7 +328,10 @@
             const [fighter, infantry, cruiser, destroyer, carrier, dreadnought, flagship, warsun] = counterValues;
             production = (fighter * 2) + (infantry * 2) + cruiser + destroyer + carrier + dreadnought + flagship + warsun;
             total = fighter + infantry + (cruiser * 2) + destroyer + (carrier * 3) + (dreadnought * 4) + (flagship * 8) + (warsun * 12);
-            totalSpanResources.textContent = total;
+            // Apply Sarween Tools adjustment (cannot go below 0)
+            const sarweenActive = sarweenCheckbox && sarweenCheckbox.checked;
+            const adjustedTotal = Math.max(0, total - (sarweenActive ? 1 : 0));
+            totalSpanResources.textContent = adjustedTotal;
             totalSpanProduction.textContent = production;
             updateProgressBar();
             updateWarning();
@@ -378,9 +386,13 @@
 
         // Update progress bar width and color
         function updateProgressBar() {
-            const percentage = (total / resourcesValue) * 100;
+            // Use adjusted total when Sarween Tools is enabled
+            const sarweenActive = sarweenCheckbox && sarweenCheckbox.checked;
+            const adjustedTotal = Math.max(0, total - (sarweenActive ? 1 : 0));
+            const denom = (resourcesValue && resourcesValue > 0) ? resourcesValue : 1;
+            const percentage = (adjustedTotal / denom) * 100;
             progressBar.style.width = percentage > 100 ? "100%" : `${percentage}%`;
-            if (total > resourcesValue) {
+            if (adjustedTotal > resourcesValue) {
                 progressBar.classList.add("exceeded");
             } else {
                 progressBar.classList.remove("exceeded");
@@ -400,13 +412,15 @@
 
         // Update warning message
         function updateWarning() {
-            if (total > resourcesValue) {
+            const sarweenActive = sarweenCheckbox && sarweenCheckbox.checked;
+            const adjustedTotal = Math.max(0, total - (sarweenActive ? 1 : 0));
+            if (adjustedTotal > resourcesValue) {
                 warningDiv.textContent = "Available resources exeeded!";
             } else {
                 warningDiv.textContent = "";
             }
-			
-			if (production > thresholdValueProduction) {
+
+            if (production > thresholdValueProduction) {
                 warningProductionDiv.textContent = "Available production exeeded!";
             } else {
                 warningProductionDiv.textContent = "";
@@ -423,6 +437,17 @@
         // Attach aria-live/tooltips for Resources and Production inputs (works for hover, focus, and touch)
         attachA11yHint(resourcesInput, resourcesInput.getAttribute('title') || 'this is the yellow number on all your unexhausted planets combined');
         attachA11yHint(InputProduction, InputProduction.getAttribute('title') || 'this is the production value on your space dock.');
+
+        // Attach hint to Sarween Tools checkbox/label
+        const sarweenLabel = document.querySelector('label[for="sarween"]');
+        if (sarweenCheckbox) {
+            sarweenCheckbox.addEventListener('change', () => {
+                updateTotal();
+                updateProgressBar();
+                updateWarning();
+            });
+        }
+        attachA11yHint(sarweenLabel, sarweenLabel && sarweenLabel.getAttribute('title'));
 
         // Attach hints to fighters and infantry <p> elements for capacity explanation
         const fighterLabel = document.querySelector('#counter1 p');
