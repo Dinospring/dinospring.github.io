@@ -98,6 +98,41 @@
             margin-right: 12px;
             flex: 0 0 auto;
         }
+        /* Fun larger checkbox styling for Sarween Tools */
+        input#sarween {
+            /* scale native checkbox for wide browser support */
+            transform: scale(1.6);
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+            vertical-align: middle;
+            accent-color: #FFD166; /* modern browsers will color the check */
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            cursor: pointer;
+        }
+
+        label[for="sarween"] {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.04);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+        }
+
+        /* Hover/active playful effects */
+        input#sarween:hover { transform: scale(1.85); }
+        label[for="sarween"]:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+
+        /* When checked make the label colorful */
+        input#sarween:checked + label[for="sarween"] {
+            background: linear-gradient(90deg,#FFD166 0%, #FF4500 100%);
+            color: #0b0b0b;
+            box-shadow: 0 10px 30px rgba(255,69,0,0.18);
+        }
         /* Utility class for screen-reader-only content (if needed) */
         .sr-only {
             position: absolute !important;
