@@ -10,23 +10,23 @@
             text-align: center;
         }
         .counter-container {
-            margin-top: 5px;
+            margin-top: 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 3px;
         }
         .counter {
             display: flex;
             align-items: center;
             gap: 10px;
             width: 100%;
-            max-width: 340px;
+            max-width: 360px;
             justify-content: flex-start;
-            padding: 4px 0;
+            padding: 1px 0;
         }
         .counter .count {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
             min-width: 28px;
             text-align: center;
@@ -49,22 +49,26 @@
             min-width: 44px;
             transition: background-color 0.18s ease;
         }
+        .counter .arrow-button:first-of-type {
+            margin-left: auto;
+        }
         .arrow-button:hover {
             background-color: #0056b3;
         }
         /* Adjust the width of the resources input field */
         #resources, #production {
             width: 40px; /* Adjust the width as needed */
-			margin: 5px;
+			margin: 1px;
             align-items: center;
 			font-size: 18px;
         }
         #reset-all {
             background-color: #FF4500;
+            margin-top: 10px;
         }
         #total {
             font-size: 24px;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         #warning, #warning-production {
             color: red;
@@ -118,7 +122,7 @@
         /* Fun larger checkbox styling for Sarween Tools */
         input#sarween {
             /* scale native checkbox for wide browser support */
-            transform: scale(1.6);
+            transform: scale(1.5);
             width: 20px;
             height: 20px;
             margin-right: 6px;
@@ -242,7 +246,7 @@
             <button class="arrow-button increment">+</button>
         </div>
     </div>
-    <button id="reset-all">Reset All</button>
+
     <!-- Display the total count -->
 
     <div id="total">Resources spent: <span id="total-count">0</span></div>
@@ -261,6 +265,8 @@
         <!-- Progress bar element -->
         <div class="progress-bar" id="progress-bar-production"></div>
 	</div>
+
+    <button id="reset-all">Reset All</button>
 
     <script>
         // Get reset button element
